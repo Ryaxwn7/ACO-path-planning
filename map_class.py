@@ -13,7 +13,7 @@ class Map:
     ''' Class used for handling the information provided by the input map '''
 
     # 每一个node有3个属性：1.位置（x，y）；2.edges; 3.spec={S,F,E,O};
-                                   # edges: 1.可以取的点；2.phermone；3.probability
+                                   # edges: 1.可以取的点；2.phermone；3.probability 4.distance
     class Nodes:
         ''' Class for representing the nodes used by the ACO algorithm '''
 
@@ -32,13 +32,21 @@ class Map:
                     for di in [-1, 0, 1]:
                         newi = self.node_pos[0] + di
                         newj = self.node_pos[1] + dj
-                        if (dj == 0 and di == 0):
-                            continue
+                        # 允许原地不动
+                        # if (dj == 0 and di == 0):
+                        #     continue
                         if (newj >= 0 and newj < jmax and newi >= 0 and newi < imax):
-                            if map_arr[newi][newj] == 1:
+                            if map_arr[newi][newj] == 1: # 判断是否为可行位置
+                                # 通过判断计算距离，避免使用sqrt
+                                if di == 0 and dj != 0:
+                                    distance = 1.0  # 上下左右方向
+                                elif di == 0 and dj == 0:
+                                    distance = 0.0
+                                else:
+                                    distance = 1.414  # 对角线方向
                                 edges.append({'FinalNode': (newi, newj),
                                               'Pheromone': 1.0, 'Probability':
-                                                  0.0})
+                                                  0.0, 'Distance': distance})
             return edges
 
     def __init__(self, map_name):
@@ -52,7 +60,7 @@ class Map:
         self.nodes_array = []
         # (self, row, col, in_map, spec)
 
-    def _create_nodes(self):
+    def _create_nodes(self): # 创建节点
         ''' Create nodes out of the initial map '''
         return [[self.Nodes(i, j, self.occupancy_map, self.in_map[i][j]) for j in
                  range(self.in_map.shape[1])] for i in range(self.in_map.shape[0])]

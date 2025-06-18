@@ -24,10 +24,12 @@ def tuple_to_list(route):
 if __name__ == '__main__':
     # Initialize parameters
     t0 = time.process_time()
-    ants = 20          # Number of ants
-    iterations = 20    # Number of iterations
-    p = 0.1           # Pheromone evaporation rate
-    Q = 1.0           # Pheromone adding constant
+    ants = 80          # Number of ants
+    iterations = 300   # Number of iterations
+    p = 0.3           # Pheromone evaporation rate
+    Q = 100           # Pheromone adding constant
+    alpha = 2      # Pheromone influence factor
+    beta = 4        # Heuristic influence factor
     display = True    # Whether to display the result
     
     # Available maps: 'map1.txt', 'map2.txt', 'map3.txt', 'small.txt', 'middle.txt', 'big.txt'
@@ -45,10 +47,6 @@ if __name__ == '__main__':
             
         if len(map.initial_node) != len(map.final_node):
             raise ValueError(f"Number of start positions ({len(map.initial_node)}) does not match number of goal positions ({len(map.final_node)})!")
-        
-        print(f"\nFound {len(map.initial_node)} robots to plan for")
-        print(f"Start positions: {map.initial_node}")
-        print(f"Goal positions: {map.final_node}")
 
         if len(map.initial_node) > 1:  # Multiple robots case
             M = []                     # Split maps for each robot
@@ -68,13 +66,13 @@ if __name__ == '__main__':
                 w.nodes_array = w._create_nodes()
                 
                 # Debug information
-                start_pos = w.initial_node
-                print(f"Robot {i+1} start position: {start_pos}")
-                start_node = w.nodes_array[start_pos[0]][start_pos[1]]
-                print(f"Robot {i+1} start node edges: {start_node.edges}")
-                print(f"Robot {i+1} occupancy map at start: {w.occupancy_map[start_pos[0]][start_pos[1]]}")
+                # start_pos = w.initial_node
+                # print(f"Robot {i+1} start position: {start_pos}")
+                # start_node = w.nodes_array[start_pos[0]][start_pos[1]]
+                # print(f"Robot {i+1} start node edges: {start_node.edges}")
+                # print(f"Robot {i+1} occupancy map at start: {w.occupancy_map[start_pos[0]][start_pos[1]]}")
                 
-                Colony = AntColony(w, ants, iterations, p, Q)
+                Colony = AntColony(w, ants, iterations, p, Q, alpha, beta)
                 path = Colony.calculate_path()
                 route.append(path)
                 print(f"Initial path for robot {i+1}: {path}")
@@ -84,7 +82,7 @@ if __name__ == '__main__':
             
             # Check and resolve conflicts
             print("\nResolving conflicts...")
-            route_sort = do_conflict_free(tuple_to_list(route))
+            route_sort = do_conflict_free(route, M, ants, iterations, p, Q, alpha, beta)
             print("\nConflict-free routes:", route_sort)
 
             # Calculate time
@@ -95,15 +93,17 @@ if __name__ == '__main__':
             # Plot results
             if display:
                 plot_picture(display=display, route=route_sort, n=len(route_sort), map=map)
-                motion_move(route_sort, map)
+                motion_move(route_sort, map, save_gif=True, output_folder='output', filename='motion_animation.gif')
         else:
             print("Single robot case - no conflict resolution needed")
             w = copy.deepcopy(map)
-            w.nodes_array = w._create_nodes()
-            Colony = AntColony(w, ants, iterations, p, Q)
+            w.initial_node = w.initial_node[0]
+            w.final_node = w.final_node[0]
+            w.nodes_array = w._create_nodes()   
+            Colony = AntColony(w, ants, iterations, p, Q, alpha, beta)
             path = Colony.calculate_path()
             print(f"Path found: {path}")
-            
+            print(f"path length: {Colony.calculate_euclidean_distance(path)}, time step: {len(path)}")
             if display:
                 plot_picture(display=display, route=[path], n=1, map=map)
     

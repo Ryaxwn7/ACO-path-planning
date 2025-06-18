@@ -1,0 +1,12 @@
+E	E	E	E	E	F	E	E	E	E	O	E
+E	E	E	E	O	E	E	O	E	O	E	E
+E	O	O	E	E	E	E	O	O	E	O	E
+E	E	E	E	O	E	E	E	E	E	F	O
+E	E	O	E	E	E	O	O	E	E	E	E
+O	E	E	E	E	E	E	E	E	S	E	O
+S	E	O	E	E	E	E	E	E	O	E	O
+E	E	E	E	O	O	S	O	E	E	E	E
+E	E	E	S	E	O	E	E	E	O	E	E
+E	E	E	O	E	O	E	E	E	E	O	E
+E	E	E	E	O	E	E	E	E	E	O	F
+E	E	E	O	O	F	E	O	O	E	E	E
